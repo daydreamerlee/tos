@@ -11,9 +11,8 @@ typedef struct _input_buffer
 
 input_buffer *input;
 
-/*
-compares strings
- */
+
+// Compares strings
 int t_strcmp(char *c1, char *c2)
 {
   int i;
@@ -25,24 +24,43 @@ int t_strcmp(char *c1, char *c2)
   return *c1 - *c2;
 }
 
+// Removes spaces
+char * deblank(char *str)
+{
+  char *out = str, *put = str;
+  for(; *str != '\0'; ++str)
+  {
+    if(*str != ' ')
+      *put++ = *str;
+  }
+  *put = '\0';
+
+  return out;
+}
+
+/*
+Removes newline
+ */
+char * clean_buffer(char *str)
+{
+  char *out = str, *put = str;
+  for(; *str != '\0'; ++str)
+  {
+    if(*str != '\n')
+      *put++ = *str;
+  }
+  *put = '\0';
+
+  return out;
+}
+
+
 /*
 clears the window
  */
 void clear_cmd(WINDOW *wnd)
 {
   clear_window(wnd);
-}
-
-void exec_sleep()
-{
-  int i;
-
-  for (i=0; i < 10; i++)
-    sleep(10);
-    wprintf(&shell_wnd, ".\n");
-  // wprintf(&shell_wnd, "Hi\n");
-  // sleep(2000);
-  // wprintf(&shell_wnd, "10 seconds later\n");
 }
 
 /*
@@ -60,9 +78,8 @@ void print_help()
 /*
 compares input and executes appropriate commands
  */
-void run_command()
+void run_command(char * cmd)
 {
-  char *cmd = &input->buffer[0];
   if (t_strcmp(cmd, "clear") == 0) {
     clear_window(&shell_wnd);
   } else if (t_strcmp(cmd, "help") == 0) {
@@ -72,8 +89,6 @@ void run_command()
   } else if (t_strcmp(cmd, "train") == 0) {
     clear_cmd(&train_wnd);
     init_train(&train_wnd);
-  } else if (t_strcmp(cmd, "sleep") == 0) {
-    exec_sleep();
   } else {
     wprintf(&shell_wnd, "command not found. try help\n");
   }  
@@ -87,12 +102,17 @@ void read_input()
   char ch;
   Keyb_Message msg;
   input->length = 0;
-  int i;
   do
   {
     msg.key_buffer = &ch;
     send(keyb_port, &msg);
     switch (ch) {
+      case '\b':
+        if (input->length == 0)
+          continue;
+        input->length--;
+        wprintf(&shell_wnd, "%c", ch);
+        break;
       case 13:
         wprintf(&shell_wnd, "\n");
         break;
@@ -101,19 +121,8 @@ void read_input()
         wprintf(&shell_wnd, "%c", ch);
         break;
     }
-  } while (ch != '\n' && ch != '\r' && input->length < 20);
+  } while (ch != '\n' && ch != '\r');
   input->buffer[input->length] = '\0';
-}
-
-/*
-removes the newline from the input string
- */
-void clean_buffer()
-{
-  input->length = 0;
-  while(input->buffer[input->length++] != '\0')
-    if (input->buffer[input->length] == '\n')
-      input->buffer[input->length] = '\0';
 }
 
 /*
@@ -122,13 +131,16 @@ main shell process function
 void shell_process (PROCESS self, PARAM param)
 {
   clear_window(&shell_wnd);
-  wprintf(&shell_wnd, "This is not an egg shell\n");
+  wprintf(&shell_wnd, "Welcome to ViSh: one of a kind shell\n");
 
   while (1) {
     wprintf(&shell_wnd, "$ ");
     read_input();
-    clean_buffer();
-    run_command();
+    char *precmd;
+    precmd = clean_buffer(&input->buffer[0]);
+    char *cmd;
+    cmd = deblank(precmd);
+    run_command(cmd);
 
   }
 }
