@@ -1,0 +1,17 @@
+MANIFEST
+MakeVars
+Makefile
+VERSION
+bochsout.txt
+etc/
+image/
+lib/
+parport.out
+snapshot.txt
+test/
+tools/
+tos.img
+ttc.jar
+ttc.save
+zamboni-id.patch
+*.o
