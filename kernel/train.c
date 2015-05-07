@@ -16,11 +16,13 @@ void clear_buffer();
 int probe_zamboni();
 
 // Configs
-void run_config1();
-void run_config1z();
-void run_config2z();
-void run_config3();
-void run_config3z();
+void config1();
+void config1z();
+void config2z();
+void config3();
+void config3z();
+void config4();
+void config4z();
 
 // Core functions
 void init_train_settings();
@@ -55,10 +57,12 @@ int probe_board()
   char input;
   input = probe("8");
 
-  if (input == '1')
+  if (probe("8") == '1')
     return 1;
+  else if (probe("16") == '1')
+    return 4;
   else
-    return 2;
+    return 3;
 }
 
 void send_cmd(char* cmd, int input_len, char* input_buffer)
@@ -169,8 +173,88 @@ int probe_zamboni()
   return dir;
 }
 
+// Config 4 with Zamboni
+void config4z()
+{
+  wprintf(&train_wnd, "Running config 4 with Zamboni\n");
+  probe_contact("4", "1");
+  set_train_speed(default_speed);
+
+  set_switch("5", "R");
+  set_switch("6", "G");
+
+  probe_contact("12", "1");
+  set_train_speed("0");
+
+  probe_contact("14", "1");
+  set_train_speed(default_speed);
+  sleep(200);
+  
+  probe_contact("14", "1");
+  set_train_speed("0");
+  set_train_speed("D");
+  set_switch("9", "G");
+  set_train_speed(default_speed);
+
+  sleep(500);
+  set_train_speed("0");
+  set_train_speed("D");
+
+  probe_contact("14", "1");
+  set_train_speed(default_speed);
+  
+  sleep(100);
+  probe_contact("14", "1");
+  set_train_speed("0");
+  set_train_speed("D");
+
+  set_switch("9", "R");
+  set_switch("1", "R");
+  set_switch("7", "G");
+  set_train_speed(default_speed);
+
+  probe_contact("9", "1");
+  set_train_speed("0");
+
+  probe_contact("7", "1");
+  set_train_speed(default_speed);
+
+  probe_contact("4", "1");
+  set_switch("4", "R");
+  set_switch("3", "R");
+  
+  probe_contact("5", "1");
+  set_train_speed("0");
+  set_switch("4", "G");
+  wprintf(&train_wnd, "Back home safely\n");
+
+
+}
+
+// Config 4 without Zamboni
+void config4() {
+  wprintf(&train_wnd, "Running config 4 without Zamboni\n");
+  set_switch("9", "G");
+  set_train_speed(default_speed);
+
+  probe_contact("14", "1");
+  sleep(300);
+  set_train_speed("0");
+  set_train_speed("D");
+
+  set_train_speed(default_speed);
+
+  set_switch("4", "R");
+  set_switch("3", "R");
+  
+  probe_contact("5", "1");
+  set_train_speed("0");
+  wprintf(&train_wnd, "Back home safely\n");
+
+}
+
 // Config 3 with Zamboni
-void run_config3z()
+void config3z()
 {
   wprintf(&train_wnd, "Running config 3 with Zamboni\n");
   probe_contact("10", "1");
@@ -203,7 +287,7 @@ void run_config3z()
 }
 
 // Config 3 without Zamboni
-void run_config3()
+void config3()
 {
   wprintf(&train_wnd, "Running config 3 without Zamboni\n");
   set_switch("5", "R");
@@ -232,7 +316,7 @@ void run_config3()
 }
 
 // Config 2 with Zamboni
-void run_config2z()
+void config2z()
 {
   wprintf(&train_wnd, "Running config 2 with Zamboni\n");
   probe_contact("4", "1");
@@ -255,7 +339,7 @@ void run_config2z()
 }
 
 // Config 1 with Zamboni
-void run_config1z()
+void config1z()
 {
   wprintf(&train_wnd, "Running config 1 with Zamboni\n");
   set_switch("4", "R");
@@ -282,7 +366,7 @@ void run_config1z()
 
 
 // Config 1 without Zamboni
-void run_config1()
+void config1()
 {
   wprintf(&train_wnd, "Running config 1 without Zamboni\n");
   set_switch("5", "R");
@@ -335,17 +419,23 @@ void train_process(PROCESS self, PARAM param)
   switch (board_state) {
     case 1:
       if (!is_zam)
-        run_config1();
+        config1();
       else if (is_zam == 710)
-        run_config1z();
+        config1z();
       else if (is_zam == 76)
-        run_config2z();
+        config2z();
       break;
-    case 2:
+    case 3:
       if (!is_zam)
-        run_config3();
+        config3();
       else
-        run_config3z();
+        config3z();
+      break;
+    case 4:
+      if (!is_zam)
+        config4();
+      else
+        config4z();
       break;
     default:
       break;
