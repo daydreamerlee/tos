@@ -178,13 +178,11 @@ void config4z()
 {
   wprintf(&train_wnd, "Running config 4 with Zamboni\n");
   probe_contact("4", "1");
+  wprintf(&train_wnd, "Starting engine\n");
   set_train_speed(default_speed);
 
   set_switch("5", "R");
   set_switch("6", "G");
-
-  probe_contact("12", "1");
-  set_train_speed("0");
 
   probe_contact("14", "1");
   set_train_speed(default_speed);
@@ -196,7 +194,7 @@ void config4z()
   set_switch("9", "G");
   set_train_speed(default_speed);
 
-  sleep(500);
+  sleep(450);
   set_train_speed("0");
   set_train_speed("D");
 
@@ -213,16 +211,10 @@ void config4z()
   set_switch("7", "G");
   set_train_speed(default_speed);
 
-  probe_contact("9", "1");
-  set_train_speed("0");
-
-  probe_contact("7", "1");
-  set_train_speed(default_speed);
-
   probe_contact("4", "1");
   set_switch("4", "R");
   set_switch("3", "R");
-  
+
   probe_contact("5", "1");
   set_train_speed("0");
   set_switch("4", "G");
@@ -235,6 +227,7 @@ void config4z()
 void config4() {
   wprintf(&train_wnd, "Running config 4 without Zamboni\n");
   set_switch("9", "G");
+  wprintf(&train_wnd, "Starting engine\n");
   set_train_speed(default_speed);
 
   probe_contact("14", "1");
@@ -292,6 +285,7 @@ void config3()
   wprintf(&train_wnd, "Running config 3 without Zamboni\n");
   set_switch("5", "R");
   set_switch("6", "G");
+  wprintf(&train_wnd, "Starting engine\n");
   set_train_speed(default_speed);
   
   probe_contact("12", "1");
