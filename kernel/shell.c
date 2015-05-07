@@ -131,7 +131,7 @@ main shell process function
 void shell_process (PROCESS self, PARAM param)
 {
   clear_window(&shell_wnd);
-  wprintf(&shell_wnd, "Welcome to ViSh: one of a kind shell\n");
+  wprintf(&shell_wnd, "This is ViSh: where Vi and Shell don't meet\n");
 
   while (1) {
     wprintf(&shell_wnd, "$ ");
