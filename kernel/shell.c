@@ -87,7 +87,6 @@ void run_command(char * cmd)
   } else if (t_strcmp(cmd, "ps") == 0) {
     print_all_processes(&shell_wnd);
   } else if (t_strcmp(cmd, "train") == 0) {
-    clear_cmd(&train_wnd);
     init_train(&train_wnd);
   } else {
     wprintf(&shell_wnd, "command not found. try help\n");
@@ -151,6 +150,7 @@ initializes the shell process
 void init_shell()
 {
   create_process(shell_process, 5, 0, "Shell Process");
+  clear_cmd(&train_wnd);  
   init_train_settings();
   resign();
 }

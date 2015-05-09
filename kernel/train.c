@@ -198,6 +198,7 @@ void config4z()
   set_train_speed("0");
   set_train_speed("D");
 
+  wprintf(&train_wnd, "Waiting\n");
   probe_contact("14", "1");
   set_train_speed(default_speed);
   
@@ -323,6 +324,7 @@ void config2z()
   set_train_speed("0");
   set_train_speed("D");
 
+  wprintf(&train_wnd, "Waiting\n");
   probe_contact("4", "1");
   set_train_speed(default_speed);
   set_switch("5", "R");
@@ -348,9 +350,12 @@ void config1z()
   set_train_speed("D");
   probe_contact("7", "1");
   set_switch("5", "G");
+
+  wprintf(&train_wnd, "Waiting\n");
   probe_contact("10", "1");
   set_switch("5", "R");
 
+  wprintf(&train_wnd, "Waiting\n");
   set_train_speed(default_speed);
   probe_contact("8", "1");
   set_switch("5", "G");
@@ -384,6 +389,7 @@ void config1()
 
 void init_train_settings()
 {
+  wprintf(&train_wnd, "Initializing settings\n");  
   set_switch("8", "G");
   set_switch("6", "R");
   set_switch("9", "R");
@@ -401,10 +407,6 @@ void train_process(PROCESS self, PARAM param)
   int board_state;
   int is_zam;
   is_zam = 0;
-
-  // init_train_settings();
-  wprintf(&train_wnd, "Initializing settings\n");
-
 
   board_state = probe_board();
 

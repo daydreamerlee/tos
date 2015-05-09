@@ -5,7 +5,6 @@ BOOL interrupts_initialized = FALSE;
 
 IDT idt [MAX_INTERRUPTS];
 PROCESS interrupt_table [MAX_INTERRUPTS];
-PROCESS p;
 
 
 void load_idt (IDT* base)
@@ -23,13 +22,10 @@ void load_idt (IDT* base)
     asm ("lidt %0" : "=m" (mem48));
 }
 
-void add_ready_queue_p()
-{
-    add_ready_queue(p);
-}
 
 void init_idt_entry (int intr_no, void (*isr) (void))
 {
+    /* TOS_IFDEF assn6 */
     idt[intr_no].offset_0_15  = (unsigned) isr & 0xffff;
     idt[intr_no].offset_16_31 = ((unsigned) isr >> 16) & 0xffff;
     idt[intr_no].selector     = CODE_SELECTOR;
@@ -39,9 +35,11 @@ void init_idt_entry (int intr_no, void (*isr) (void))
     idt[intr_no].dt           = 0;
     idt[intr_no].dpl          = 0;
     idt[intr_no].p            = 1;
+    /* TOS_ENDIF assn6 */
 }
 
 
+/* TOS_IFDEF assn6 */
 void fatal_exception (int n)
 {
     WINDOW error_window = {0, 24, 80, 1, 0, 0, ' '};
@@ -165,14 +163,18 @@ void dummy_spurious_int ()
     asm ("spurious_int:");
     asm ("pusha;movb $0x20,%al;outb %al,$0x20;popa;iret");
 }
+/* TOS_ENDIF assn6 */
 
 
 /*
  * Timer ISR
  */
+
+
 void isr_timer ();
-void dummy_isr_timer ()
+void isr_timer_wrapper()
 {
+    /* TOS_IFDEF assn7 */
     /*
      *	PUSHL	%EAX		; Save process' context
      *  PUSHL   %ECX
@@ -185,24 +187,12 @@ void dummy_isr_timer ()
     asm ("isr_timer:");
     asm ("pushl %eax;pushl %ecx;pushl %edx");
     asm ("pushl %ebx;pushl %ebp;pushl %esi;pushl %edi");
-
     /* Save the context pointer ESP to the PCB */
     asm ("movl %%esp,%0" : "=m" (active_proc->esp) : );
-
-    /*
-     * If a process is waiting for this interrupt, then put it
-     * to the ready queue
-     */
-    p = interrupt_table[TIMER_IRQ];
-    if (p && p->state == STATE_INTR_BLOCKED)
-      add_ready_queue_p();
-
-    /* Dispatch new process */
-    active_proc = dispatcher();
-
+    /* Call the actual implementation of the ISR */
+    asm ("call isr_timer_impl");
     /* Restore context pointer ESP */
     asm ("movl %0,%%esp" : : "m" (active_proc->esp) );
-
     /*
      *	MOVB  $0x20,%AL	; Reset interrupt controller
      *	OUTB  %AL,$0x20
@@ -219,6 +209,27 @@ void dummy_isr_timer ()
     asm ("popl %edi;popl %esi;popl %ebp;popl %ebx");
     asm ("popl %edx;popl %ecx;popl %eax");
     asm ("iret");
+    /* TOS_ENDIF assn7 */
+}
+
+void isr_timer_impl ()
+{
+    /* TOS_IFDEF assn7 */
+    /* TOS_IFDEF assn8 */
+    /*
+     * If a process is waiting for this interrupt, then put it back
+     * to the ready queue.
+     */
+    PROCESS p = interrupt_table[TIMER_IRQ];
+    if (p && p->state == STATE_INTR_BLOCKED) {
+	/* Add event handler to ready queue */
+	add_ready_queue (p);
+    }
+    /* TOS_ENDIF assn8 */
+    
+    /* Dispatch new process */
+    active_proc = dispatcher();
+    /* TOS_ENDIF assn7 */
 }
 
 
@@ -227,10 +238,11 @@ void dummy_isr_timer ()
  * COM1 ISR
  */
 void isr_com1 ();
-void dummy_isr_com1 ()
+void wrapper_isr_com1 ()
 {
-        /*
-     *  PUSHL   %EAX        ; Save process' context
+    /* TOS_IFDEF assn9 */
+    /*
+     *	PUSHL	%EAX		; Save process' context
      *  PUSHL   %ECX
      *  PUSHL   %EDX
      *  PUSHL   %EBX
@@ -241,41 +253,47 @@ void dummy_isr_com1 ()
     asm ("isr_com1:");
     asm ("pushl %eax;pushl %ecx;pushl %edx");
     asm ("pushl %ebx;pushl %ebp;pushl %esi;pushl %edi");
-
-    if ((p = interrupt_table[COM1_IRQ]) == NULL)
-    panic ("service_intr_0x64: Spurious interrupt");
-    
-    if (p->state != STATE_INTR_BLOCKED)
-    panic ("service_intr_0x64: No process waiting");
-
     /* Save the context pointer ESP to the PCB */
     asm ("movl %%esp,%0" : "=m" (active_proc->esp) : );
-
-    /* Add event handler to ready queue */
-    add_ready_queue_p();
-
-    /* Dispatch new process */
-    active_proc = dispatcher();
-
+    /* Call the actual implementation of the ISR */
+    asm ("call isr_com1_impl");
     /* Restore context pointer ESP */
     asm ("movl %0,%%esp" : : "m" (active_proc->esp) );
-
     /*
-     *  MOVB  $0x20,%AL ; Reset interrupt controller
-     *  OUTB  %AL,$0x20
-     *  POPL  %EDI      ; Restore previously saved context
+     *	MOVB  $0x20,%AL	; Reset interrupt controller
+     *	OUTB  %AL,$0x20
+     *	POPL  %EDI      ; Restore previously saved context
      *  POPL  %ESI
      *  POPL  %EBP
      *  POPL  %EBX
      *  POPL  %EDX
      *  POPL  %ECX
      *  POPL  %EAX
-     *  IRET        ; Return to new process
+     *	IRET		; Return to new process
      */
     asm ("movb $0x20,%al;outb %al,$0x20");
     asm ("popl %edi;popl %esi;popl %ebp;popl %ebx");
     asm ("popl %edx;popl %ecx;popl %eax");
     asm ("iret");
+    /* TOS_ENDIF assn9 */
+}
+
+void isr_com1_impl()
+{
+    /* TOS_IFDEF assn9 */
+    PROCESS p;
+    if ((p = interrupt_table[COM1_IRQ]) == NULL)
+	panic ("service_intr_0x64: Spurious interrupt");
+    
+    if (p->state != STATE_INTR_BLOCKED)
+	panic ("service_intr_0x64: No process waiting");
+
+    /* Add event handler to ready queue */
+    add_ready_queue (p);
+
+    /* Dispatch new process */
+    active_proc = dispatcher();
+    /* TOS_ENDIF assn9 */
 }
 
 
@@ -283,7 +301,7 @@ void dummy_isr_com1 ()
  * Keyboard ISR
  */
 void isr_keyb();
-void dummy_isr_keyb()
+void wrapper_isr_keyb()
 {
     /*
      *	PUSHL	%EAX		; Save process' context
@@ -297,28 +315,12 @@ void dummy_isr_keyb()
     asm ("isr_keyb:");
     asm ("pushl %eax;pushl %ecx;pushl %edx");
     asm ("pushl %ebx;pushl %ebp;pushl %esi;pushl %edi");
-
     /* Save the context pointer ESP to the PCB */
     asm ("movl %%esp,%0" : "=m" (active_proc->esp) : );
-
-    p = interrupt_table[KEYB_IRQ];
-
-    if (p == NULL) {
-	panic ("service_intr_0x61: Spurious interrupt");
-    }
-
-    if (p->state != STATE_INTR_BLOCKED) {
-	panic ("service_intr_0x61: No process waiting");
-    }
-
-    /* Add event handler to ready queue */
-    add_ready_queue_p();
-
-    active_proc = dispatcher();
-
+    /* Call the actual implementation of the ISR */
+    asm ("call isr_keyb_impl");
     /* Restore context pointer ESP */
     asm ("movl %0,%%esp" : : "m" (active_proc->esp) );
-
     /*
      *	MOVB  $0x20,%AL	; Reset interrupt controller
      *	OUTB  %AL,$0x20
@@ -337,25 +339,39 @@ void dummy_isr_keyb()
     asm ("iret");
 }
 
+void isr_keyb_impl()
+{
+    PROCESS p = interrupt_table[KEYB_IRQ];
+
+    if (p == NULL) {
+	panic ("service_intr_0x61: Spurious interrupt");
+    }
+
+    if (p->state != STATE_INTR_BLOCKED) {
+	panic ("service_intr_0x61: No process waiting");
+    }
+
+    /* Add event handler to ready queue */
+    add_ready_queue (p);
+
+    active_proc = dispatcher();
+}
+
 void wait_for_interrupt (int intr_no)
 {
-  volatile int saved_if;
+    /* TOS_IFDEF assn8 */
+    volatile int flag;
 
-  DISABLE_INTR (saved_if);
-  //assert(interrupt_table[intr_no] == NULL);
-  
-  if (interrupt_table [intr_no] != NULL)
-    panic ("wait_for_interrupt(): ISR busy");
-
-  interrupt_table[intr_no] = active_proc;
-  remove_ready_queue (active_proc);
-  active_proc->state = STATE_INTR_BLOCKED;
-  resign();
-
-  interrupt_table [intr_no] = NULL;
-
-  ENABLE_INTR (saved_if);
-
+    DISABLE_INTR (flag);
+    if (interrupt_table [intr_no] != NULL)
+	panic ("wait_for_interrupt(): ISR busy");
+    interrupt_table [intr_no] = active_proc;
+    remove_ready_queue (active_proc);
+    active_proc->state = STATE_INTR_BLOCKED;
+    resign();
+    interrupt_table [intr_no] = NULL;
+    ENABLE_INTR (flag);
+    /* TOS_ENDIF assn8 */
 }
 
 
@@ -393,6 +409,7 @@ void re_program_interrupt_controller ()
 
 void init_interrupts()
 {
+    /* TOS_IFDEF assn6 */
     int i;
 
     assert (sizeof (IDT) == IDT_ENTRY_SIZE);
@@ -419,15 +436,23 @@ void init_interrupts()
     init_idt_entry (14, exception14);
     init_idt_entry (15, exception15);
     init_idt_entry (16, exception16);
+    /* TOS_IFDEF assn7 */
     init_idt_entry (TIMER_IRQ, isr_timer);
+    /* TOS_ENDIF assn7 */
+    /* TOS_IFDEF assn9 */
+    init_idt_entry (COM1_IRQ, isr_com1);
+    /* TOS_ENDIF assn9 */
+    /* TOS_IFDEF assn10 */
     init_idt_entry (KEYB_IRQ, isr_keyb);
-    init_idt_entry(COM1_IRQ, isr_com1);
+    /* TOS_ENDIF assn10 */
     
     re_program_interrupt_controller();
-
-    for (i = 0; i < MAX_INTERRUPTS; i++)
-      interrupt_table [i] = NULL;
     
+    /* TOS_IFDEF assn8 */
+    for (i = 0; i < MAX_INTERRUPTS; i++)
+	interrupt_table [i] = NULL;
+    /* TOS_ENDIF assn8 */
     interrupts_initialized = TRUE;
     asm ("sti");
+    /* TOS_ENDIF assn6 */
 }
