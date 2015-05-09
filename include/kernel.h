@@ -274,6 +274,9 @@ void init_shell();
 void init_train(WINDOW* wnd);
 void set_train_speed(char* speed);
 void init_train_settings();
+void start_train();
+void stop_train();
+void reverse_train();
 
 /*=====>>> pacman.c <<<==================================================*/
 

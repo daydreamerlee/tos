@@ -1,7 +1,7 @@
 #include <kernel.h>
 
-WINDOW shell_wnd = {0, 9, 61, 16, 0, 0, 0xDC};
-WINDOW train_wnd = {0, 0, 80, 8, 0, 0, ' '};
+WINDOW shell_wnd = {0, 9, 50, 16, 0, 0, 0xDC};
+WINDOW train_wnd = {0, 0, 60, 8, 0, 0, ' '};
 
 // Struct datetype
 typedef struct _input_buffer
@@ -82,10 +82,13 @@ void clear_cmd(WINDOW *wnd)
 void print_help()
 {
   wprintf(&shell_wnd, "List of commands supported:\n");
-  wprintf(&shell_wnd, "ps         show list of processes\n");
-  wprintf(&shell_wnd, "clear      clears the window buffer\n");
-  wprintf(&shell_wnd, "train      launches the train process\n");
-  wprintf(&shell_wnd, "help       this help\n");
+  wprintf(&shell_wnd, "ps               show list of processes\n");
+  wprintf(&shell_wnd, "clear            clears the window buffer\n");
+  wprintf(&shell_wnd, "train            launches the train process\n");
+  wprintf(&shell_wnd, "train go         starts the train\n");
+  wprintf(&shell_wnd, "train stop       stops the train\n");
+  wprintf(&shell_wnd, "train reverse    reverses the direction of train\n");
+  wprintf(&shell_wnd, "help             this help\n");
 }
 
 /**
@@ -102,6 +105,12 @@ void run_command(char * cmd)
     print_all_processes(&shell_wnd);
   } else if (t_strcmp(cmd, "train") == 0) {
     init_train(&train_wnd);
+  } else if (t_strcmp(cmd, "traingo") == 0) {
+    start_train();
+  } else if (t_strcmp(cmd, "trainstop") == 0) {
+    stop_train();
+  } else if (t_strcmp(cmd, "trainreverse") == 0) {
+    reverse_train();
   } else {
     wprintf(&shell_wnd, "command not found. try help\n");
   }  

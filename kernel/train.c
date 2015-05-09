@@ -31,6 +31,31 @@ void init_train(WINDOW* wnd);
 
 // Auxillary functions
 void start_train();
+void stop_train();
+
+/**
+ * Starts the train
+ */
+void start_train()
+{
+  set_train_speed(default_speed);
+}
+
+/**
+ * Stops the train
+ */
+void stop_train()
+{
+  set_train_speed("0");
+}
+
+/**
+ * Reverses the train direction
+ */
+void reverse_train()
+{
+  set_train_speed("D");
+}
 
 /**
  * Concatenate strings to build the command string
