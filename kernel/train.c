@@ -29,6 +29,14 @@ void init_train_settings();
 void train_process(PROCESS self, PARAM param);
 void init_train(WINDOW* wnd);
 
+// Auxillary functions
+void start_train();
+
+/**
+ * Concatenate strings to build the command string
+ * @param str1 
+ * @param str2
+ */
 void str_concat(char* str1, char* str2) {
   int i;
   int str1_len;
@@ -38,6 +46,11 @@ void str_concat(char* str1, char* str2) {
   str1 [i + str1_len] = '\0';
 }
 
+/**
+ * Probes a contact ID
+ * @param  contact_id 
+ * @return result of probe
+ */
 char probe(char* contact_id)
 {
   char cmd[10];
@@ -52,6 +65,10 @@ char probe(char* contact_id)
   return input[1];
 }
 
+/**
+ * Probes the state of the board
+ * @return int that indicates state of board
+ */
 int probe_board()
 {
   char input;
@@ -65,6 +82,12 @@ int probe_board()
     return 3;
 }
 
+/**
+ * Sends a command to the com1 port
+ * @param cmd          the command
+ * @param input_len    input length
+ * @param input_buffer the input buffer
+ */
 void send_cmd(char* cmd, int input_len, char* input_buffer)
 {
   COM_Message msg;
@@ -80,6 +103,11 @@ void send_cmd(char* cmd, int input_len, char* input_buffer)
   send(com_port, &msg);
 }
 
+/**
+ * Sets switch ID setting to 'R' or 'G'
+ * @param switch_id 
+ * @param setting 
+ */
 void set_switch(char* switch_id, char* setting)
 {
    char cmd[10];
@@ -92,6 +120,10 @@ void set_switch(char* switch_id, char* setting)
    send_cmd(cmd, 0, &temp);
 }
 
+/**
+ * Controls train speed
+ * @param speed from 0-5 or D
+ */
 void set_train_speed(char* speed)
 {
    char cmd[10];
@@ -108,6 +140,12 @@ void set_train_speed(char* speed)
    send_cmd(cmd, 0, &temp);
 }
 
+/**
+ * Probes contact ID's state
+ * @param  contact_id 
+ * @param  status 0 or 1
+ * @return
+ */
 int probe_contact(char* contact_id, char* status)
 {
   char input;
@@ -120,6 +158,9 @@ int probe_contact(char* contact_id, char* status)
   return 0;
 }
 
+/**
+ * Clears s88 memory buffer
+ */
 void clear_buffer()
 {
   char cmd[10];
@@ -130,6 +171,10 @@ void clear_buffer()
   send_cmd(cmd, 0, &temp);
 }
 
+/**
+ * Probes if Zamboni is running
+ * @return [description]
+ */
 int probe_zamboni()
 {
   int i;
@@ -200,6 +245,8 @@ void config4z()
 
   wprintf(&train_wnd, "Waiting\n");
   probe_contact("14", "1");
+
+  wprintf(&train_wnd, "Resuming\n");
   set_train_speed(default_speed);
   
   sleep(100);
@@ -326,6 +373,7 @@ void config2z()
 
   wprintf(&train_wnd, "Waiting\n");
   probe_contact("4", "1");
+  wprintf(&train_wnd, "Resuming\n");
   set_train_speed(default_speed);
   set_switch("5", "R");
 
@@ -346,16 +394,17 @@ void config1z()
 
   clear_buffer();
   probe_contact("1", "1");
+
+  wprintf(&train_wnd, "Waiting\n");
   set_train_speed("0");
   set_train_speed("D");
   probe_contact("7", "1");
   set_switch("5", "G");
 
-  wprintf(&train_wnd, "Waiting\n");
   probe_contact("10", "1");
   set_switch("5", "R");
 
-  wprintf(&train_wnd, "Waiting\n");
+  wprintf(&train_wnd, "Resuming\n");
   set_train_speed(default_speed);
   probe_contact("8", "1");
   set_switch("5", "G");
@@ -386,7 +435,9 @@ void config1()
   wprintf(&train_wnd, "Back home safely\n");
 }
 
-
+/**
+ * Initialize the train switches to sane settings
+ */
 void init_train_settings()
 {
   wprintf(&train_wnd, "Initializing settings\n");  
@@ -402,6 +453,11 @@ void init_train_settings()
   set_switch("3", "G");
 }
 
+/**
+ * Main train process
+ * @param self  
+ * @param param 
+ */
 void train_process(PROCESS self, PARAM param)
 {
   int board_state;
@@ -440,6 +496,10 @@ void train_process(PROCESS self, PARAM param)
   resign();
 }
 
+/**
+ * Initialize the train process
+ * @param wnd Window to run the process
+ */
 void init_train(WINDOW* wnd)
 {
   create_process(train_process, 5, (PARAM) wnd, "Train process");

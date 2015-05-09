@@ -3,6 +3,7 @@
 WINDOW shell_wnd = {0, 9, 61, 16, 0, 0, 0xDC};
 WINDOW train_wnd = {0, 0, 80, 8, 0, 0, ' '};
 
+// Struct datetype
 typedef struct _input_buffer
 {
   int length;
@@ -12,7 +13,12 @@ typedef struct _input_buffer
 input_buffer *input;
 
 
-// Compares strings
+/**
+ * Compares two strings
+ * @param  c1
+ * @param  c2 
+ * @return
+ */
 int t_strcmp(char *c1, char *c2)
 {
   int i;
@@ -24,7 +30,11 @@ int t_strcmp(char *c1, char *c2)
   return *c1 - *c2;
 }
 
-// Removes spaces
+/**
+ * Removes spaces from the input buffer
+ * @param  str 
+ * @return string without spaces
+ */
 char * deblank(char *str)
 {
   char *out = str, *put = str;
@@ -38,8 +48,10 @@ char * deblank(char *str)
   return out;
 }
 
-/*
-Removes newline
+/**
+ * Removes newline from the input buffer
+ * @param  str 
+ * @return string without newline
  */
 char * clean_buffer(char *str)
 {
@@ -55,16 +67,17 @@ char * clean_buffer(char *str)
 }
 
 
-/*
-clears the window
+/**
+ * Clear a window buffer
+ * @param wnd
  */
 void clear_cmd(WINDOW *wnd)
 {
   clear_window(wnd);
 }
 
-/*
-prints help
+/**
+ * Print help
  */
 void print_help()
 {
@@ -75,8 +88,9 @@ void print_help()
   wprintf(&shell_wnd, "help       this help\n");
 }
 
-/*
-compares input and executes appropriate commands
+/**
+ * Run a command based on input
+ * @param cmd 
  */
 void run_command(char * cmd)
 {
@@ -93,8 +107,8 @@ void run_command(char * cmd)
   }  
 }
 
-/*
-reads from the input buffer
+/**
+ * Read input from the keystrokes
  */
 void read_input()
 {
@@ -124,8 +138,10 @@ void read_input()
   input->buffer[input->length] = '\0';
 }
 
-/*
-main shell process function
+/**
+ * Main shell process
+ * @param self 
+ * @param param 
  */
 void shell_process (PROCESS self, PARAM param)
 {
@@ -140,12 +156,11 @@ void shell_process (PROCESS self, PARAM param)
     char *cmd;
     cmd = deblank(precmd);
     run_command(cmd);
-
   }
 }
 
-/*
-initializes the shell process
+/**
+ * Initialize the shell process
  */
 void init_shell()
 {
