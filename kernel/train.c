@@ -209,7 +209,7 @@ int probe_zamboni()
   dir = 0;
   wprintf(&train_wnd, "Checking for Zamboni\n");
 
-  for (i = 0; i < 25; i++) {
+  for (i = 0; i < 30; i++) {
     sleep(10);
     if (probe("7") == '1') {
       wprintf(&train_wnd, "Zamboni is found\n");
@@ -260,12 +260,14 @@ void config4z()
   
   probe_contact("14", "1");
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
   set_switch("9", "G");
   set_train_speed(default_speed);
 
-  sleep(450);
+  sleep(480);
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
 
   wprintf(&train_wnd, "Waiting\n");
@@ -277,6 +279,7 @@ void config4z()
   sleep(100);
   probe_contact("14", "1");
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
 
   set_switch("9", "R");
@@ -292,8 +295,6 @@ void config4z()
   set_train_speed("0");
   set_switch("4", "G");
   wprintf(&train_wnd, "Back home safely\n");
-
-
 }
 
 // Config 4 without Zamboni
@@ -304,8 +305,9 @@ void config4() {
   set_train_speed(default_speed);
 
   probe_contact("14", "1");
-  sleep(300);
+  sleep(350);
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
 
   set_train_speed(default_speed);
@@ -332,6 +334,7 @@ void config3z()
   set_switch("4", "R");
   set_switch("3", "G");
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
   set_train_speed(default_speed);
 
@@ -339,6 +342,7 @@ void config3z()
 
   probe_contact("12", "1");
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
 
   set_switch("7", "G");
@@ -347,6 +351,7 @@ void config3z()
 
   probe_contact("5", "1");
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
   wprintf(&train_wnd, "Back home safely\n");  
 
@@ -363,12 +368,14 @@ void config3()
   
   probe_contact("12", "1");
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
 
   set_train_speed(default_speed);
   
   probe_contact("13", "1");
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
 
   set_train_speed(default_speed);
@@ -394,6 +401,7 @@ void config2z()
   probe_contact("1", "1");
   set_switch("4", "G");
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
 
   wprintf(&train_wnd, "Waiting\n");
@@ -422,6 +430,7 @@ void config1z()
 
   wprintf(&train_wnd, "Waiting\n");
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
   probe_contact("7", "1");
   set_switch("5", "G");
@@ -441,7 +450,7 @@ void config1z()
 // Config 1 without Zamboni
 void config1()
 {
-  wprintf(&train_wnd, "Running config 1 without Zamboni\n");
+  wprintf(&train_wnd, "Running config 1/2 without Zamboni\n");
   set_switch("5", "R");
   set_switch("4", "R");
   set_switch("3", "G");
@@ -452,6 +461,7 @@ void config1()
   probe_contact("1", "1");
 
   set_train_speed("0");
+  wprintf(&train_wnd, "Reversing\n");
   set_train_speed("D");
   set_train_speed(default_speed);
 
@@ -488,6 +498,8 @@ void train_process(PROCESS self, PARAM param)
   int board_state;
   int is_zam;
   is_zam = 0;
+
+  init_train_settings();
 
   board_state = probe_board();
 

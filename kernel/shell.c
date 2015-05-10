@@ -113,6 +113,7 @@ void run_command(char * cmd)
   } else if (t_strcmp(cmd, "ps") == 0) {
     print_all_processes(&shell_wnd);
   } else if (t_strcmp(cmd, "train") == 0) {
+    clear_cmd(&train_wnd);
     init_train(&train_wnd);
   } else if (t_strcmp(cmd, "traingo") == 0) {
     start_train();
@@ -187,7 +188,5 @@ void shell_process (PROCESS self, PARAM param)
 void init_shell()
 {
   create_process(shell_process, 5, 0, "Shell Process");
-  clear_cmd(&train_wnd);
-  init_train_settings();
   resign();
 }
