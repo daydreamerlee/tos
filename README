@@ -1,0 +1,5 @@
+shell.c
+-------
+shell initializes the train switches with init_train_settings()
+
+run 'help' to see commands available

@@ -43,7 +43,7 @@ int t_strcmp(char *c1, char *c2)
  * @param  str 
  * @return string without spaces
  */
-char * deblank(char *str)
+char * despace(char *str)
 {
   char *out = str, *put = str;
   for(; *str != '\0'; ++str)
@@ -113,7 +113,6 @@ void run_command(char * cmd)
   } else if (t_strcmp(cmd, "ps") == 0) {
     print_all_processes(&shell_wnd);
   } else if (t_strcmp(cmd, "train") == 0) {
-    init_train_settings();
     init_train(&train_wnd);
   } else if (t_strcmp(cmd, "traingo") == 0) {
     start_train();
@@ -177,7 +176,7 @@ void shell_process (PROCESS self, PARAM param)
     char *precmd;
     precmd = clean_buffer(&input->buffer[0]);
     char *cmd;
-    cmd = deblank(precmd);
+    cmd = despace(precmd);
     run_command(cmd);
   }
 }
@@ -188,6 +187,7 @@ void shell_process (PROCESS self, PARAM param)
 void init_shell()
 {
   create_process(shell_process, 5, 0, "Shell Process");
-  clear_cmd(&train_wnd);  
+  clear_cmd(&train_wnd);
+  init_train_settings();
   resign();
 }
