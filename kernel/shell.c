@@ -1,7 +1,8 @@
 #include <kernel.h>
 
-WINDOW shell_wnd = {0, 9, 50, 16, 0, 0, 0xDC};
-WINDOW train_wnd = {0, 0, 60, 8, 0, 0, ' '};
+WINDOW shell_wnd = {0, 9, 50, 5, 0, 0, 0xDC};
+WINDOW train_wnd = {0, 0, 50, 20, 0, 0, ' '};
+WINDOW pac_wnd = {55, 7, 25, 20, 0, 0, ' '};
 
 // Struct datetype
 typedef struct _input_buffer
@@ -12,6 +13,13 @@ typedef struct _input_buffer
 
 input_buffer *input;
 
+/**
+ * Runs the pacman process
+ */
+void run_pacman(WINDOW* wnd)
+{
+  init_pacman(wnd, 3);
+}
 
 /**
  * Compares two strings
@@ -111,6 +119,8 @@ void run_command(char * cmd)
     stop_train();
   } else if (t_strcmp(cmd, "trainreverse") == 0) {
     reverse_train();
+  } else if (t_strcmp(cmd, "pacman") == 0) {
+    run_pacman(&pac_wnd);
   } else {
     wprintf(&shell_wnd, "command not found. try help\n");
   }  

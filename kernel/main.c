@@ -12,6 +12,7 @@ void kernel_main()
     outportb(0x03D4, 0x0F);
     outportb(0x03D5, 0xFF);
 
+    clear_window(kernel_window);
     init_process();
     init_dispatcher();
     init_ipc();
