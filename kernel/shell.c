@@ -1,7 +1,7 @@
 #include <kernel.h>
 
-WINDOW shell_wnd = {0, 9, 50, 5, 0, 0, 0xDC};
-WINDOW train_wnd = {0, 0, 50, 20, 0, 0, ' '};
+WINDOW shell_wnd = {0, 10, 50, 15, 0, 0, 0xDC};
+WINDOW train_wnd = {0, 0, 50, 8, 0, 0, ' '};
 WINDOW pac_wnd = {55, 7, 25, 20, 0, 0, ' '};
 
 // Struct datetype
@@ -96,6 +96,7 @@ void print_help()
   wprintf(&shell_wnd, "train go         starts the train\n");
   wprintf(&shell_wnd, "train stop       stops the train\n");
   wprintf(&shell_wnd, "train reverse    reverses the direction of train\n");
+  wprintf(&shell_wnd, "pacman           runs the pacman game\n");  
   wprintf(&shell_wnd, "help             this help\n");
 }
 
@@ -112,6 +113,7 @@ void run_command(char * cmd)
   } else if (t_strcmp(cmd, "ps") == 0) {
     print_all_processes(&shell_wnd);
   } else if (t_strcmp(cmd, "train") == 0) {
+    init_train_settings();
     init_train(&train_wnd);
   } else if (t_strcmp(cmd, "traingo") == 0) {
     start_train();
@@ -121,6 +123,8 @@ void run_command(char * cmd)
     reverse_train();
   } else if (t_strcmp(cmd, "pacman") == 0) {
     run_pacman(&pac_wnd);
+  } else if (t_strcmp(cmd, "") == 0) {
+    return;
   } else {
     wprintf(&shell_wnd, "command not found. try help\n");
   }  
@@ -185,6 +189,5 @@ void init_shell()
 {
   create_process(shell_process, 5, 0, "Shell Process");
   clear_cmd(&train_wnd);  
-  init_train_settings();
   resign();
 }
