@@ -1,3 +1,6 @@
-shell.c
--------
+tos/kernel/shell.c
+------------------
 run 'help' to see commands available
+
+tos/kernel/train.c
+------------------
