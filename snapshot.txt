@@ -1,0 +1,25 @@
+Plex86/Bochs VGABios (PCI) current-cvs 19 Sep 2012
+This VGA/VBE Bios is released under the GNU LGPL
+
+Please visit :
+ . http://bochs.sourceforge.net
+ . http://www.nongnu.org/vgabios
+
+NO Bochs VBE Support available!
+
+Welcome to ViSh: one of a kind shell
+$ Ü
+
+
+
+
+
+
+
+
+
+
+
+
+
+
